@@ -13,10 +13,11 @@ const char* ssid = "Tec";
 #define EAP_IDENTITY "a01275287@tec.mx"
 #define EAP_PASSWORD "Oskar310802$"
 
-
+// Writing credentials
 unsigned long myChannelNumber = 1;
 const char * myWriteAPIKey = "5IVATAVA6XG7PI2I";
 
+// Reading credentials
 unsigned long StationChannelNumber = 1950128;
 unsigned long FieldNumber = 1;
 const char * myReadAPIKey = "7JN3HEU1DRXH7BJK";
@@ -25,10 +26,12 @@ const char * myReadAPIKey = "7JN3HEU1DRXH7BJK";
 unsigned long lastTime = 0;
 unsigned long timerDelay = 30000;
 
+// Write variable
 float t;
 
 void setup() 
 {
+    
     Serial.begin(115200);  //Initialize serial
     Serial.println(F("Running..."));
   
@@ -36,7 +39,7 @@ void setup()
     WiFi.disconnect(true);      
     WiFi.mode(WIFI_STA);   //init wifi mode
     Serial.printf("Connecting to WiFi: %s ", ssid);
-    //esp_wifi_sta_wpa2_ent_set_ca_cert((uint8_t *)incommon_ca, strlen(incommon_ca) + 1);
+    // esp_wifi_sta_wpa2_ent_set_ca_cert((uint8_t *)incommon_ca, strlen(incommon_ca) + 1);
     esp_wifi_sta_wpa2_ent_set_identity((uint8_t *)EAP_IDENTITY, strlen(EAP_IDENTITY));
     esp_wifi_sta_wpa2_ent_set_username((uint8_t *)EAP_IDENTITY, strlen(EAP_IDENTITY));
     esp_wifi_sta_wpa2_ent_set_password((uint8_t *)EAP_PASSWORD, strlen(EAP_PASSWORD));
@@ -75,11 +78,11 @@ void loop()
             Serial.println("\nConnected.");
         }
 
-        //Valor dummy enviado por la Esp32
+        // Value sent to ThingSpeak
         t = 1.0;
     
         // Write to ThingSpeak. There are up to 8 fields in a channel, allowing you to store up to 8 different
-        // pieces of information in a channel.  Here, we write to field 1.
+        // pieces of information in a channel. .
         int x = ThingSpeak.writeField(myChannelNumber, 2, t, myWriteAPIKey);
 
         if(x == 200)
@@ -91,7 +94,7 @@ void loop()
             Serial.println("Problem updating channel. HTTP error code " + String(x));
         }
     
-         // Read 
+         // Read from ThingSpeak
   
         float y = ThingSpeak.readFloatField(StationChannelNumber, FieldNumber, myReadAPIKey);
         int statusCode = ThingSpeak.getLastReadStatus();
