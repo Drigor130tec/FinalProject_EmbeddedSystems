@@ -1,15 +1,3 @@
-/*
-  Adapted from WriteSingleField Example from ThingSpeak Library (Mathworks)
-  
-  Rui Santos
-  Complete project details at https://RandomNerdTutorials.com/esp32-thingspeak-publish-arduino/
-  
-  Permission is hereby granted, free of charge, to any person obtaining a copy
-  of this software and associated documentation files.
-  
-  The above copyright notice and this permission notice shall be included in all
-  copies or substantial portions of the Software.
-*/
 #include <esp_wpa2.h>
 #include "ThingSpeak.h"
 #if defined(ESP32)
@@ -17,17 +5,10 @@
 #elif defined(ESP8266)
   #include <ESP8266WiFi.h>
 #endif
-//#include <Firebase_ESP_Client.h>
-//#include <Adafruit_BME280.h>
-//#include <Adafruit_Sensor.h>
-#include "DHT.h"
 
 #define DHTPIN 4     // Digital pin connected to the DHT sensor
 #define DHTTYPE DHT11   // DHT 11
 DHT dht(DHTPIN, DHTTYPE);
-
-//const char* ssid = "Tec-IoT";   // your network SSID (name) 
-//const char* password = "spotless.magnetic.bridge";   // your network password
 
 WiFiClient  client;
 
@@ -44,14 +25,10 @@ const char * myWriteAPIKey = "5IVATAVA6XG7PI2I";
 unsigned long lastTime = 0;
 unsigned long timerDelay = 30000;
 
-// Variable to hold temperature readings
-float temperatureC;
-
-
 void setup() 
 {
     Serial.begin(115200);  //Initialize serial
-    Serial.println(F("DHTxx test!"));
+    Serial.println(F("Running..."));
 
     dht.begin();
   
@@ -98,37 +75,7 @@ void loop()
             Serial.println("\nConnected.");
         }
 
-        // Reading temperature or humidity takes about 250 milliseconds!
-        // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
-        float h = dht.readHumidity();
-        // Read temperature as Celsius (the default)
-        float t = dht.readTemperature();
-        // Read temperature as Fahrenheit (isFahrenheit = true)
-        float f = dht.readTemperature(true);
-
-        // Check if any reads failed and exit early (to try again).
-//        if (isnan(h) || isnan(t) || isnan(f)) 
-//        {
-//            Serial.println(F("Failed to read from DHT sensor!"));
-//            return;
-//        }
-
-        // Compute heat index in Fahrenheit (the default)
-        float hif = dht.computeHeatIndex(f, h);
-        // Compute heat index in Celsius (isFahreheit = false)
-        float hic = dht.computeHeatIndex(t, h, false);
-
-        Serial.print(F("Humidity: "));
-        Serial.print(h);
-        Serial.print(F("%  Temperature: "));
-        Serial.print(t);
-        Serial.print(F("°C "));
-        Serial.print(f);
-        Serial.print(F("°F  Heat index: "));
-        Serial.print(hic);
-        Serial.print(F("°C "));
-        Serial.print(hif);
-        Serial.println(F("°F"));
+        //Valor dummy enviado por la Esp32
         t = 1.0;
     
         // Write to ThingSpeak. There are up to 8 fields in a channel, allowing you to store up to 8 different
