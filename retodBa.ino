@@ -6,10 +6,6 @@
   #include <ESP8266WiFi.h>
 #endif
 
-#define DHTPIN 4     // Digital pin connected to the DHT sensor
-#define DHTTYPE DHT11   // DHT 11
-DHT dht(DHTPIN, DHTTYPE);
-
 WiFiClient  client;
 
 // Insert your network credentials
@@ -21,16 +17,20 @@ const char* ssid = "Tec";
 unsigned long myChannelNumber = 1;
 const char * myWriteAPIKey = "5IVATAVA6XG7PI2I";
 
+unsigned long StationChannelNumber = 1950128;
+unsigned long FieldNumber = 1;
+const char * myReadAPIKey = "7JN3HEU1DRXH7BJK";
+
 // Timer variables
 unsigned long lastTime = 0;
 unsigned long timerDelay = 30000;
+
+float t;
 
 void setup() 
 {
     Serial.begin(115200);  //Initialize serial
     Serial.println(F("Running..."));
-
-    dht.begin();
   
     // WPA2 enterprise magic starts here
     WiFi.disconnect(true);      
@@ -90,19 +90,19 @@ void loop()
         {
             Serial.println("Problem updating channel. HTTP error code " + String(x));
         }
-        lastTime = millis();
     
-         // Read in field 4 of the public channel recording the temperature
+         // Read 
   
-        int y = ThingSpeak.writeField(StationChannelNumber, FieldNumber);
+        float y = ThingSpeak.readFloatField(StationChannelNumber, FieldNumber, myReadAPIKey);
+        int statusCode = ThingSpeak.getLastReadStatus();
 
-        if(y == 200)
+        if(statusCode == 200)
         {
-            Serial.println(String(y);
+            Serial.println(String(y));
         }
         else
         {
-            Serial.println("Problem reading channel"));
+            Serial.println("Problem reading channel");
         }
         lastTime = millis();
     }
