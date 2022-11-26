@@ -92,5 +92,18 @@ void loop()
         }
         lastTime = millis();
     }
+         // Read in field 4 of the public channel recording the temperature
   
+        int y = ThingSpeak.writeField(StationChannelNumber, FieldNumber);
+
+        if(y == 200)
+        {
+            Serial.println(String(y);
+        }
+        else
+        {
+            Serial.println("Problem reading channel"));
+        }
+        lastTime = millis();
+    }
 }
