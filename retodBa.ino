@@ -91,7 +91,7 @@ void loop()
             Serial.println("Problem updating channel. HTTP error code " + String(x));
         }
         lastTime = millis();
-    }
+    
          // Read in field 4 of the public channel recording the temperature
   
         int y = ThingSpeak.writeField(StationChannelNumber, FieldNumber);
