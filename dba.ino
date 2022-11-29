@@ -1,5 +1,6 @@
 #include <driver/i2s.h>
 #include "simpleDSP.h"
+#include "FFT.h"
 
 
 
@@ -44,6 +45,8 @@ int32_t raw_samples[SAMPLE_BUFFER_SIZE];
 int32_t prev_audio[SAMPLE_BUFFER_SIZE];
 int32_t current_audio[SAMPLE_BUFFER_SIZE];
 int32_t sample_audio[SAMPLE_BUFFER_SIZE];
+float fft_output[SAMPLE_BUFFER_SIZE];
+float fft_input[SAMPLE_BUFFER_SIZE];
 
 
 //FILTER SETTINGS
@@ -76,18 +79,18 @@ IIR iir1;
 
 void setup()
 {
-    // we need serial output for the plotter
     Serial.begin(115200);
-    // start up the I2S peripheral
+    // Start up the I2S peripheral
     i2s_driver_install(I2S_NUM_0, &i2s_config, 0, NULL);
     i2s_set_pin(I2S_NUM_0, &i2s_mic_pins);
     //Filter constructor
     iirInit(&iir1, 7, coefB, 7, coefA);
     Serial.println("IIR filter initiliaze finished");
 
+
     
-    //PREVIOUS AUDIO
-    // read from the I2S device
+    // PREVIOUS AUDIO
+    // Read from the I2S device
     size_t bytes_read = 0;
     i2s_read(I2S_NUM_0, raw_samples, sizeof(int32_t) * SAMPLE_BUFFER_SIZE, &bytes_read, portMAX_DELAY);
     int samples_read = bytes_read / sizeof(int32_t);
@@ -102,7 +105,8 @@ void setup()
 
 void loop()
 {
-    // read from the I2S device
+    char print_buf[300];
+    // Read from the I2S device
     size_t bytes_read = 0;
     i2s_read(I2S_NUM_0, raw_samples, sizeof(int32_t) * SAMPLE_BUFFER_SIZE, &bytes_read, portMAX_DELAY);
     int samples_read = bytes_read / sizeof(int32_t);
@@ -110,7 +114,14 @@ void loop()
 //    {
 //        Serial.printf("%ld\n", raw_samples[i]);
 //    }
+    // Initialization of filter
     iirInit(&iir1, 7, coefB, 7, coefA);
+    //Serial.println("IIR filter initiliaze finished");
+
+    // Initialization of FFT
+    fft_config_t *real_fft_plan = fft_init(SAMPLE_BUFFER_SIZE, FFT_REAL, FFT_FORWARD, fft_input, fft_output);
+
+    // Create the sample vector
     for (int i = 0; i < SAMPLE_BUFFER_SIZE; i++)
     {
         current_audio[i] = iirFilt(&iir1, raw_samples[i]);
@@ -121,5 +132,20 @@ void loop()
           sample_audio[i] = current_audio[i-SAMPLE_BUFFER_SIZE/2];
         }
         prev_audio[i] = current_audio[i]; 
+        real_fft_plan->input[i] = (float)sample_audio[i];
     }   
+
+    // Execute FFT, output buffer is automatically populated
+    fft_execute(real_fft_plan);
+    for (int k = 1 ; k < real_fft_plan->size / 2 ; k++)
+    {
+        /*The real part of a magnitude at a frequency is followed by the corresponding imaginary part in the output*/
+        float mag = sqrt(pow(real_fft_plan->output[2*k],2) + pow(real_fft_plan->output[2*k+1],2))/1;
+        Serial.sprintf(print_buf," %f", mag);
+    }
+    fft_destroy(real_fft_plan);
+
+
+
+    
 }
