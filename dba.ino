@@ -18,7 +18,7 @@ const char* ssid = "Tec";
 
 // Writing credentials
 unsigned long myChannelNumber = 1;
-const char * myWriteAPIKey = "5IVATAVA6XG7PI2I";
+const char * myWriteAPIKey = "SBJKEL09A4LAQ18T";
 
 // Reading credentials
 unsigned long StationChannelNumber = 1950128;
@@ -206,7 +206,7 @@ void loop()
         if (db > DB_LIMIT){
             // Write to ThingSpeak. There are up to 8 fields in a channel, allowing you to store up to 8 different
             // pieces of information in a channel. .
-            int x = ThingSpeak.writeField(myChannelNumber, 2, db, myWriteAPIKey);
+            int x = ThingSpeak.writeField(myChannelNumber, 1, db, myWriteAPIKey);
     
             if(x == 200)
             {
