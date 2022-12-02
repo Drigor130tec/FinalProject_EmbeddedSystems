@@ -30,7 +30,7 @@ unsigned long lastTime = 0;
 unsigned long timerDelay = 30000;
 
 #define DB_LIMIT 70
-#define GAIN 20 //Gain for the dB's calibration
+#define GAIN 15 //Gain for the dB's calibration
 
 //MIC SETTINGS
 #define SAMPLE_BUFFER_SIZE 2048 //Fs*0.5 seg, closest 2 power 
@@ -185,10 +185,11 @@ void loop()
     sum = sum / 1;
     float p = ((float)1/(SAMPLE_BUFFER_SIZE/2))*sum;
     float db = 10*log(p)+GAIN;
+    if (p == 0)db = 50; //Lower limit
     Serial.println(db);
 
     
-    if ((millis() - lastTime) > timerDelay) 
+    if ((millis() - lastTime) > timerDelay and db > 70) 
     {
     
         // Connect or reconnect to WiFi
@@ -218,20 +219,8 @@ void loop()
             }
             lastTime = millis();
         }    
-         // Read from ThingSpeak
-  
-//        float y = ThingSpeak.readFloatField(StationChannelNumber, FieldNumber, myReadAPIKey);
-//        int statusCode = ThingSpeak.getLastReadStatus();
-//
-//        if(statusCode == 200)
-//        {
-//            Serial.println(String(y));
-//        }
-//        else
-//        {
-//            Serial.println("Problem reading channel");
-//        }
     }
+    delay(1000);
     fft_destroy(real_fft_plan);
     
 }
