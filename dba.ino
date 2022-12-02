@@ -27,7 +27,7 @@ const char * myReadAPIKey = "7JN3HEU1DRXH7BJK";
 
 // Timer variables
 unsigned long lastTime = 0;
-unsigned long timerDelay = 30000;
+unsigned long timerDelay = 15000;
 
 #define DB_LIMIT 70
 #define GAIN 15 //Gain for the dB's calibration
@@ -189,7 +189,7 @@ void loop()
     Serial.println(db);
 
     
-    if ((millis() - lastTime) > timerDelay and db > 70) 
+    if ((millis() - lastTime) > timerDelay) 
     {
     
         // Connect or reconnect to WiFi
@@ -203,23 +203,24 @@ void loop()
             } 
             Serial.println("\nConnected.");
         }
-        if (db > DB_LIMIT){
-            // Write to ThingSpeak. There are up to 8 fields in a channel, allowing you to store up to 8 different
-            // pieces of information in a channel. .
-            int x = ThingSpeak.writeField(myChannelNumber, 1, db, myWriteAPIKey);
-    
-            if(x == 200)
-            {
-                Serial.print("Channel update successful. ");
-                Serial.println(db);
-            }
-            else
-            {
-                Serial.println("Problem updating channel. HTTP error code " + String(x));
-            }
-            lastTime = millis();
+        if (!(db > DB_LIMIT)){
+            db = 0;
+        }
+        // Write to ThingSpeak. There are up to 8 fields in a channel, allowing you to store up to 8 different
+        // pieces of information in a channel. .
+        int x = ThingSpeak.writeField(myChannelNumber, 1, db, myWriteAPIKey);
+
+        if(x == 200)
+        {
+            Serial.print("Channel update successful. ");
+            Serial.println(db);
+        }
+        else
+        {
+            Serial.println("Problem updating channel. HTTP error code " + String(x));
+        }
+        lastTime = millis();
         }    
-    }
     delay(1000);
     fft_destroy(real_fft_plan);
     
